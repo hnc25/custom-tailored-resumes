@@ -1,0 +1,14 @@
+{
+  "_comment": "This is a schema example, not real data. The /tailor-resume command generates a real keywords.json per JD in the project root before running ats_check.py.",
+  "must_have": [
+    "product strategy",
+    "roadmap",
+    "cross-functional leadership",
+    "AI"
+  ],
+  "nice_to_have": [
+    "SQL",
+    "Agile",
+    "P&L ownership"
+  ]
+}
