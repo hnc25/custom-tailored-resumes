@@ -1,6 +1,6 @@
 # Custom Tailored Resumes — Claude Code Project
 
-Generates ATS-optimized, tailored resumes + cover letters from job descriptions, using your own core resume as the source of truth. This is a fully generic, bring-your-own-content pipeline — no example data or personal information ships with this repo.
+Generates ATS-optimized tailored resumes, plus visual resume + cover letter versions, from job descriptions, using your own core resume as the source of truth. This is a fully generic, bring-your-own-content pipeline — no example data or personal information ships with this repo.
 
 ## Setup (one-time)
 
@@ -11,7 +11,7 @@ Generates ATS-optimized, tailored resumes + cover letters from job descriptions,
    ```
    npm install
    ```
-   This installs `docx` (docx-js), which renders the Professional cover letter. The pipeline won't produce all four outputs without it.
+   This installs `docx` (docx-js), which renders the Professional cover letter. The pipeline won't produce all three outputs without it.
 5. Supply your own content in `reference/` (none of this is included — you provide it):
    - **`reference/core-resume.docx`** (required) — your actual resume: every real job, title, date range, and metric. This is the single source of truth the pipeline will never contradict or fabricate beyond. Your name, contact info, education, and credentials for the Professional sidebar are also pulled from here.
    - **`reference/photo.jpg`** (required) — your headshot, used in the sidebar of the two Professional outputs. Portrait, head-and-shoulders, face roughly centered. It's auto-cropped to 5:6. This file is gitignored so it never gets committed.
@@ -42,13 +42,12 @@ with no arguments — the command will find and process every file in `jobs/` in
 
 ## What comes out
 
-For each JD processed, four files land in `output/`:
+For each JD processed, three files land in `output/`:
 - **`Resume_<Company>_<Date>.docx`** — the ATS-optimized resume: single column, standard fonts, no tables/images. Scored by `ats_check.py`. **Upload this one to application portals.**
-- **`CoverLetter_<Company>_<Date>.docx`** — the matching ATS-safe cover letter.
 - **`Professional_<Company>_<Date>.docx`** — a visual two-column version of the same tailored resume: a navy sidebar with your photo, name, contact, core expertise, education, and certifications, plus the profile and experience in the main column. Expands to two pages automatically when needed.
-- **`Professional_CoverLetter_<Company>_<Date>.docx`** — a matching visual cover letter with the same sidebar and the same letter text.
+- **`Professional_CoverLetter_<Company>_<Date>.docx`** — the tailored cover letter, in the same visual layout as the Professional resume. This is the only cover letter the pipeline produces. No separate plain version is saved.
 
-The two Professional files reuse the exact tailored content from the ATS versions. Nothing is redrafted. They are **not ATS-checked**, on purpose: photos, positioned frames, and multi-column layouts break ATS parsers. Use them where a human reads the document directly, such as networking, emailing a hiring manager, or bringing a printed copy to an interview.
+The Professional resume reuses the exact tailored content from the ATS resume. Nothing is redrafted. The two Professional files are **not ATS-checked**, on purpose: photos, positioned frames, and multi-column layouts break ATS parsers. Use them where a human reads the document directly, such as networking, emailing a hiring manager, a portal's cover-letter upload, or bringing a printed copy to an interview.
 
 Plus a summary in the chat covering:
 - Role bucket classification (e.g., Product Management vs. Product Development framing) and why
@@ -101,7 +100,7 @@ custom-tailored-resumes/
 ├── package.json                        ← Node dependency (docx); run `npm install` once
 ├── jobs/                               ← drop JD .txt files here for batch mode
 │   └── applied/                        ← move a JD's .txt file here once you've applied
-└── output/                             ← all four tailored documents land here
+└── output/                             ← the three tailored documents land here
 ```
 
 ## Credit

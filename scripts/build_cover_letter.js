@@ -5,8 +5,8 @@
  * This is the rendering layer only. All content (letter paragraphs, recipient,
  * salutation, sidebar copy, photo) is passed in as a JSON file — nothing here is
  * per-job or hardcoded. It is invoked by scripts/build_cover_letter_professional.py,
- * which supplies that JSON (assembled from the same tailored content used for the
- * plain ATS cover letter and the Professional resume, with identity fields pulled
+ * which supplies that JSON (the letter drafted in /tailor-resume step 6 plus the
+ * Professional resume's sidebar content, with identity fields pulled
  * from reference/core-resume.docx and reference/background-notes.md).
  *
  * Requires the `docx` npm package: run `npm install` once in the project root.

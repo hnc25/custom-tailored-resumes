@@ -1,5 +1,5 @@
 {
-  "_comment": "Content formats for the two Professional outputs. Bold markup inside strings: **text**. Identity fields (name, credentials, contact, education, certifications) are REQUIRED to come from reference/core-resume.docx and reference/background-notes.md — never invented. credentials and certifications are optional; their sidebar sections are omitted when empty. Everything else reuses content already drafted for the plain ATS resume / cover letter.",
+  "_comment": "Content formats for the two Professional outputs. Bold markup inside strings: **text**. Identity fields (name, credentials, contact, education, certifications) are REQUIRED to come from reference/core-resume.docx and reference/background-notes.md — never invented. credentials and certifications are optional; their sidebar sections are omitted when empty. Everything else reuses content already drafted in /tailor-resume (the ATS resume and the step 6 letter draft).",
 
   "professional_resume": {
     "_file": "professional_<Company>.json -> scripts/build_professional.py",
@@ -33,7 +33,7 @@
     "date": "Month D, YYYY",
     "recipient": ["Hiring Manager name (optional)", "Company", "City, ST"],
     "salutation": "Dear Hiring Manager,",
-    "paragraphs": ["Same paragraphs as the plain ATS cover letter."],
+    "paragraphs": ["Paragraphs from the step 6 cover letter draft."],
     "closing": "Sincerely,",
     "closing_name": "Your Name (defaults to name)"
   }

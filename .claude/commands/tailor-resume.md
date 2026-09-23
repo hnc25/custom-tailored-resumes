@@ -1,10 +1,10 @@
 ---
-description: Generate an ATS-optimized, tailored resume + cover letter (plus matching Professional visual versions) from a pasted job description
+description: Generate an ATS-optimized tailored resume, plus visual Professional resume + cover letter versions, from a pasted job description
 ---
 
 # Tailor Resume & Cover Letter
 
-You are producing a tailored resume and cover letter (each in two versions: a plain ATS-safe version and a visual "Professional" version) for the user for the job description provided in `$ARGUMENTS`. If no argument was given, check `jobs/` for `.txt`/`.md` files first:
+You are producing three tailored documents for the user (a plain ATS-safe resume, a visual "Professional" resume, and a matching Professional cover letter) for the job description provided in `$ARGUMENTS`. If no argument was given, check `jobs/` for `.txt`/`.md` files first:
 
 - **No files in `jobs/`** → ask the user to paste the JD directly.
 - **One or more files in `jobs/`** → this is a batch run. For EACH file found, execute steps 1 through 9 below yourself, in this same session, one JD at a time, in a loop. Do NOT invoke `/tailor-resume` again to process the next file — slash commands can only be typed by the user, not called by you as a sub-routine. You already have the full pipeline instructions below; just repeat them inline for each file until all are processed, then give one consolidated report at the end covering every JD.
@@ -68,7 +68,7 @@ Using `reference/core-resume.docx` as the base and any supplied `reference/style
 
 ## 6. Draft the cover letter
 
-Generate a fresh, professional cover letter (not reused from any fixed template) — proper business letter heading (the user's contact info, date, hiring company/manager if named in the JD, salutation), 3-4 paragraphs: opening hook tied to the specific role, 1-2 paragraphs connecting the user's real background to the JD's top priorities, closing with a call to action. Same docx formatting constraints as the resume. The domain-framing decision from step 4 applies here too — never claim or imply direct domain experience the Executive Profile doesn't claim.
+Generate a fresh, professional cover letter (not reused from any fixed template) — proper business letter heading (the user's contact info, date, hiring company/manager if named in the JD, salutation), 3-4 paragraphs: opening hook tied to the specific role, 1-2 paragraphs connecting the user's real background to the JD's top priorities, closing with a call to action. This step drafts the letter **content** only (recipient, salutation, paragraphs, closing). It is not saved as its own plain `.docx` and is not ATS-checked. Step 8b renders it as the Professional cover letter. The domain-framing decision from step 4 applies here too — never claim or imply direct domain experience the Executive Profile doesn't claim.
 
 ## 7. Run the ATS check
 
@@ -80,10 +80,9 @@ If the composite score is below 80, or must-have keyword coverage is below 90%, 
 
 ## 8. Save outputs
 
-Save to the flat `output/` folder using this naming convention (all four are required, every JD):
+Save to the flat `output/` folder using this naming convention (all three are required, every JD):
 
 - `output/Resume_<Company>_<YYYY-MM-DD>.docx`
-- `output/CoverLetter_<Company>_<YYYY-MM-DD>.docx`
 - `output/Professional_<Company>_<YYYY-MM-DD>.docx`
 - `output/Professional_CoverLetter_<Company>_<YYYY-MM-DD>.docx`
 
@@ -95,7 +94,7 @@ After the ATS resume has passed (or exhausted) the step 7 loop, build the two vi
 
 - **Identity/sidebar fields** (`name`, `credentials`, `contact`, `education`, `certifications`): pull these from `reference/core-resume.docx` (and `reference/background-notes.md` for certifications, if supplied). Use exactly what the user's source files say. Never invent or embellish. Omit `credentials`/`certifications` if the user has none; the scripts drop those sidebar sections when they're empty.
 - **Professional resume content** (`headline`, `tagline`, `profile`, `core_expertise`, `experience`): copy the final headline, Executive Profile, Core Competencies, and per-role bullets from the ATS resume as finalized in step 7. If there are more than ~12 competencies, keep the most JD-relevant ~12 for the sidebar. `**bold**` markup may highlight metrics.
-- **Professional cover letter content** (`date`, `recipient`, `salutation`, `paragraphs`, `closing`): copy verbatim from the step 6 cover letter. Use the same `core_expertise` list as the Professional resume.
+- **Professional cover letter content** (`date`, `recipient`, `salutation`, `paragraphs`, `closing`): copy verbatim from the step 6 cover letter draft. Use the same `core_expertise` list as the Professional resume.
 
 Write the content to `professional_<Company>.json` and `cover_professional_<Company>.json` in the project root (format: `reference/professional_schema.json`), then run:
 
@@ -104,7 +103,7 @@ python3 scripts/build_professional.py professional_<Company>.json output/Profess
 python3 scripts/build_cover_letter_professional.py cover_professional_<Company>.json output/Professional_CoverLetter_<Company>_<Date>.docx
 ```
 
-**These two files are NOT ATS-checked. Never run them through `ats_check.py`.** They intentionally use images, positioned frames, header-anchored background bands, and a table layout, all of which break ATS parsers. They are for human readers only: networking, direct email to a hiring manager, and in-person handoffs. The ATS versions remain the ones to upload to application portals. The no-fabrication, domain-framing, and repetition rules already applied to the source content carry over unchanged.
+**These two files are NOT ATS-checked. Never run them through `ats_check.py`.** They intentionally use images, positioned frames, header-anchored background bands, and a table layout, all of which break ATS parsers. They are for human readers: networking, direct email to a hiring manager, in-person handoffs, and any portal cover-letter upload field. The ATS resume remains the resume to upload to application portals. The no-fabrication, domain-framing, and repetition rules already applied to the source content carry over unchanged.
 
 If either script fails, fix the content JSON (a missing required field is the usual cause) and re-run. Don't skip the output.
 
@@ -115,4 +114,4 @@ For each JD processed, summarize:
 - **Domain fit** — always include this line, every JD, every run: either "Direct domain match" (name the domain) or the adjacent domain/business model used to bridge the gap (per step 4). Never omit this line, even when the gap is small.
 - Final ATS composite score + must-have/nice-to-have coverage
 - Any genuine gaps (JD requirements with no real match in the user's background) — surfaced honestly, not papered over
-- File paths of all four output documents (ATS resume, ATS cover letter, Professional resume, Professional cover letter), noting that the two Professional files are not ATS-checked
+- File paths of all three output documents (ATS resume, Professional resume, Professional cover letter), noting that the two Professional files are not ATS-checked

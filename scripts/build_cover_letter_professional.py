@@ -2,8 +2,8 @@
 """
 build_cover_letter_professional.py — Build the visually-designed "Professional"
 cover letter (navy photo sidebar + letter body), matching the Professional resume's
-look. Fourth pipeline output. Like the Professional resume, it is for human reading
-only and is NOT ATS-checked.
+look. Third pipeline output and the only cover letter the pipeline saves. Like the
+Professional resume, it is for human reading and is NOT ATS-checked.
 
 Rendering is delegated to scripts/build_cover_letter.js (docx-js) because docx-js
 handles a shaded full-height table sidebar more simply than python-docx for a
@@ -16,8 +16,8 @@ single-page document. This module is the content/orchestration layer:
 
 Nothing about the candidate is hardcoded. Identity and sidebar content come from the
 content JSON, which the /tailor-resume pipeline fills in from reference/core-resume.docx
-and reference/background-notes.md, and the letter paragraphs are the same ones already
-drafted for the plain ATS cover letter.
+and reference/background-notes.md, and the letter paragraphs are the ones drafted in
+/tailor-resume step 6.
 
 Usage:
     python scripts/build_cover_letter_professional.py cover_professional_<Company>.json \
