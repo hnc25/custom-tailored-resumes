@@ -6,9 +6,15 @@ Generates ATS-optimized, tailored resumes + cover letters from job descriptions,
 
 1. Clone or unzip this project into a folder on your machine — this becomes its own Claude Code project.
 2. Open a terminal in that folder and run `claude` to start Claude Code there.
-3. Confirm `python-docx` is available: `pip install python-docx --break-system-packages` (if not already installed).
-4. Supply your own content in `reference/` (none of this is included — you provide it):
-   - **`reference/core-resume.docx`** (required) — your actual resume: every real job, title, date range, and metric. This is the single source of truth the pipeline will never contradict or fabricate beyond.
+3. Install the Python dependencies: `pip install python-docx pillow pymupdf --break-system-packages` (skip any already installed). `pymupdf` is only used to measure the Professional resume's page count; without it the script falls back to an estimate.
+4. **Install Node.js (required).** Get Node.js 18 or newer (which includes npm) from [nodejs.org](https://nodejs.org), then run this once in the project folder:
+   ```
+   npm install
+   ```
+   This installs `docx` (docx-js), which renders the Professional cover letter. The pipeline won't produce all four outputs without it.
+5. Supply your own content in `reference/` (none of this is included — you provide it):
+   - **`reference/core-resume.docx`** (required) — your actual resume: every real job, title, date range, and metric. This is the single source of truth the pipeline will never contradict or fabricate beyond. Your name, contact info, education, and credentials for the Professional sidebar are also pulled from here.
+   - **`reference/photo.jpg`** (required) — your headshot, used in the sidebar of the two Professional outputs. Portrait, head-and-shoulders, face roughly centered. It's auto-cropped to 5:6. This file is gitignored so it never gets committed.
    - **`reference/background-notes.md`** (optional but recommended) — an extended fact bank: named tools, certifications, compliance frameworks, board/leadership roles, and role-level detail that didn't make it into the core resume but are still real and usable for adjacent-skill matching. A LinkedIn profile export is a good source for this.
    - **`reference/style-examples/`** (optional but recommended) — up to two resumes you've already written (or like the tone/structure of) that represent the style you want tailored output to match. These are style references only — the pipeline pulls no new facts from them.
 
@@ -36,9 +42,13 @@ with no arguments — the command will find and process every file in `jobs/` in
 
 ## What comes out
 
-For each JD processed, two files land in `output/`:
-- `Resume_<Company>_<Date>.docx`
-- `CoverLetter_<Company>_<Date>.docx`
+For each JD processed, four files land in `output/`:
+- **`Resume_<Company>_<Date>.docx`** — the ATS-optimized resume: single column, standard fonts, no tables/images. Scored by `ats_check.py`. **Upload this one to application portals.**
+- **`CoverLetter_<Company>_<Date>.docx`** — the matching ATS-safe cover letter.
+- **`Professional_<Company>_<Date>.docx`** — a visual two-column version of the same tailored resume: a navy sidebar with your photo, name, contact, core expertise, education, and certifications, plus the profile and experience in the main column. Expands to two pages automatically when needed.
+- **`Professional_CoverLetter_<Company>_<Date>.docx`** — a matching visual cover letter with the same sidebar and the same letter text.
+
+The two Professional files reuse the exact tailored content from the ATS versions. Nothing is redrafted. They are **not ATS-checked**, on purpose: photos, positioned frames, and multi-column layouts break ATS parsers. Use them where a human reads the document directly, such as networking, emailing a hiring manager, or bringing a printed copy to an interview.
 
 Plus a summary in the chat covering:
 - Role bucket classification (e.g., Product Management vs. Product Development framing) and why
@@ -77,13 +87,21 @@ custom-tailored-resumes/
 ├── .claude/commands/tailor-resume.md   ← the pipeline definition (slash command)
 ├── reference/
 │   ├── core-resume.docx                ← YOU SUPPLY THIS — source of truth
+│   ├── photo.jpg                       ← YOU SUPPLY THIS — headshot for the Professional outputs (gitignored)
+│   ├── PUT_YOUR_PHOTO_HERE.md          ← placeholder note for photo.jpg
 │   ├── background-notes.md             ← YOU SUPPLY THIS (optional) — extended facts for adjacent-skill matching
 │   ├── style-examples/                 ← YOU SUPPLY THESE (optional) — up to two style-pattern resumes
-│   └── keywords_schema.json            ← format for the per-JD keyword extraction file
-├── scripts/ats_check.py                ← objective ATS scoring
+│   ├── keywords_schema.json            ← format for the per-JD keyword extraction file
+│   └── professional_schema.json        ← content format for the two Professional outputs
+├── scripts/
+│   ├── ats_check.py                    ← objective ATS scoring
+│   ├── build_professional.py           ← Professional (two-column, photo) resume builder
+│   ├── build_cover_letter_professional.py  ← Professional cover letter builder (calls the .js renderer)
+│   └── build_cover_letter.js           ← docx-js renderer for the Professional cover letter
+├── package.json                        ← Node dependency (docx); run `npm install` once
 ├── jobs/                               ← drop JD .txt files here for batch mode
 │   └── applied/                        ← move a JD's .txt file here once you've applied
-└── output/                             ← tailored resumes + cover letters land here
+└── output/                             ← all four tailored documents land here
 ```
 
 ## Credit

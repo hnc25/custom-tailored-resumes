@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+node_modules/
+
+# User-supplied personal inputs — never commit
+reference/photo.jpg
+/professional_*.json
+/cover_professional_*.json

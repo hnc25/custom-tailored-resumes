@@ -1,0 +1,12 @@
+{
+  "name": "custom-tailored-resumes",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Node dependency (docx-js) for the Professional cover letter renderer and docx-js resume builds. Run `npm install` once after cloning.",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "docx": "^9.7.1"
+  }
+}

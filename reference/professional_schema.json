@@ -1,0 +1,40 @@
+{
+  "_comment": "Content formats for the two Professional outputs. Bold markup inside strings: **text**. Identity fields (name, credentials, contact, education, certifications) are REQUIRED to come from reference/core-resume.docx and reference/background-notes.md — never invented. credentials and certifications are optional; their sidebar sections are omitted when empty. Everything else reuses content already drafted for the plain ATS resume / cover letter.",
+
+  "professional_resume": {
+    "_file": "professional_<Company>.json -> scripts/build_professional.py",
+    "name": "Your Name",
+    "credentials": "Degree abbreviations, e.g. MBA (optional)",
+    "contact": ["City, ST", "phone", "email", "linkedin.com/in/you"],
+    "education": [{"degree": "Degree, Field", "school": "Institution"}],
+    "certifications": ["Certification name (optional)"],
+    "headline": "TARGET ROLE TITLE | TARGET-ROLE TAGLINE",
+    "tagline": "One-line italic subtitle under the headline (optional)",
+    "profile": ["Executive profile paragraph 1.", "Executive profile paragraph 2 (optional)."],
+    "core_expertise": ["Sidebar item 1 (about 12 fit on page 1)", "Sidebar item 2"],
+    "experience": [
+      {
+        "company": "EMPLOYER NAME",
+        "title": "Job Title",
+        "dates": "Mon YYYY – Mon YYYY",
+        "bullets": ["Bullet with a **bold metric**."]
+      }
+    ]
+  },
+
+  "professional_cover_letter": {
+    "_file": "cover_professional_<Company>.json -> scripts/build_cover_letter_professional.py",
+    "name": "Your Name",
+    "credentials": "(optional, same as resume)",
+    "contact": ["(same as resume)"],
+    "education": [{"degree": "(same as resume)", "school": "..."}],
+    "certifications": ["(optional, same as resume)"],
+    "core_expertise": ["(same list as the Professional resume sidebar)"],
+    "date": "Month D, YYYY",
+    "recipient": ["Hiring Manager name (optional)", "Company", "City, ST"],
+    "salutation": "Dear Hiring Manager,",
+    "paragraphs": ["Same paragraphs as the plain ATS cover letter."],
+    "closing": "Sincerely,",
+    "closing_name": "Your Name (defaults to name)"
+  }
+}

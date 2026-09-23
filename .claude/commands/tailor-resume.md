@@ -1,10 +1,10 @@
 ---
-description: Generate an ATS-optimized, tailored resume + cover letter from a pasted job description
+description: Generate an ATS-optimized, tailored resume + cover letter (plus matching Professional visual versions) from a pasted job description
 ---
 
 # Tailor Resume & Cover Letter
 
-You are producing a tailored resume and cover letter for the user for the job description provided in `$ARGUMENTS`. If no argument was given, check `jobs/` for `.txt`/`.md` files first:
+You are producing a tailored resume and cover letter (each in two versions: a plain ATS-safe version and a visual "Professional" version) for the user for the job description provided in `$ARGUMENTS`. If no argument was given, check `jobs/` for `.txt`/`.md` files first:
 
 - **No files in `jobs/`** → ask the user to paste the JD directly.
 - **One or more files in `jobs/`** → this is a batch run. For EACH file found, execute steps 1 through 9 below yourself, in this same session, one JD at a time, in a loop. Do NOT invoke `/tailor-resume` again to process the next file — slash commands can only be typed by the user, not called by you as a sub-routine. You already have the full pipeline instructions below; just repeat them inline for each file until all are processed, then give one consolidated report at the end covering every JD.
@@ -19,6 +19,8 @@ You are producing a tailored resume and cover letter for the user for the job de
   - Competencies/Core Expertise section swapped to foreground JD-relevant terms
   - Per-employer bullets reworded to emphasize the metric/angle most relevant to this JD (same underlying facts, different framing — e.g., a throughput improvement can be framed as "scaling" for a growth-focused JD or "platform reliability" for an operations-focused JD)
   - Certifications and Technology sections reordered so the most JD-relevant items lead
+- `reference/photo.jpg` — the user's headshot, used by the two Professional outputs in step 8b. **Required; does not ship with this project.** If it's missing, stop and tell the user to add it (see `reference/PUT_YOUR_PHOTO_HERE.md`) before proceeding.
+- Node.js + `npm install` — the Professional cover letter renders via `scripts/build_cover_letter.js` (docx-js). If `node_modules/` doesn't exist in the project root, run `npm install` once before step 8b.
 
 **Dollar-figure / metric phrasing convention:** If the user's `background-notes.md` or `core-resume.docx` defines an authoritative phrasing convention for budget/spend figures (e.g., always phrase as "$XMM in spend", not "annual business value"), follow it consistently across the resume and cover letter. Do not alter the underlying numbers when tailoring — only the phrasing may be adapted to fit sentence flow. If the user has flagged specific figures as corrected/authoritative (superseding older phrasings), always use the corrected version, even if an older phrasing resurfaces from a prior draft or output file.
 
@@ -78,12 +80,33 @@ If the composite score is below 80, or must-have keyword coverage is below 90%, 
 
 ## 8. Save outputs
 
-Save to the flat `output/` folder using this naming convention:
+Save to the flat `output/` folder using this naming convention (all four are required, every JD):
 
 - `output/Resume_<Company>_<YYYY-MM-DD>.docx`
 - `output/CoverLetter_<Company>_<YYYY-MM-DD>.docx`
+- `output/Professional_<Company>_<YYYY-MM-DD>.docx`
+- `output/Professional_CoverLetter_<Company>_<YYYY-MM-DD>.docx`
 
 Use today's date and the company name extracted from the JD (sanitize for filesystem: no spaces → underscores, no special characters).
+
+## 8b. Build the Professional (visual) versions
+
+After the ATS resume has passed (or exhausted) the step 7 loop, build the two visual "Professional" documents: a two-column layout with a navy photo sidebar. **Do not redraft anything.** Both reuse the final, already-tailored content from steps 5–7:
+
+- **Identity/sidebar fields** (`name`, `credentials`, `contact`, `education`, `certifications`): pull these from `reference/core-resume.docx` (and `reference/background-notes.md` for certifications, if supplied). Use exactly what the user's source files say. Never invent or embellish. Omit `credentials`/`certifications` if the user has none; the scripts drop those sidebar sections when they're empty.
+- **Professional resume content** (`headline`, `tagline`, `profile`, `core_expertise`, `experience`): copy the final headline, Executive Profile, Core Competencies, and per-role bullets from the ATS resume as finalized in step 7. If there are more than ~12 competencies, keep the most JD-relevant ~12 for the sidebar. `**bold**` markup may highlight metrics.
+- **Professional cover letter content** (`date`, `recipient`, `salutation`, `paragraphs`, `closing`): copy verbatim from the step 6 cover letter. Use the same `core_expertise` list as the Professional resume.
+
+Write the content to `professional_<Company>.json` and `cover_professional_<Company>.json` in the project root (format: `reference/professional_schema.json`), then run:
+
+```bash
+python3 scripts/build_professional.py professional_<Company>.json output/Professional_<Company>_<Date>.docx
+python3 scripts/build_cover_letter_professional.py cover_professional_<Company>.json output/Professional_CoverLetter_<Company>_<Date>.docx
+```
+
+**These two files are NOT ATS-checked. Never run them through `ats_check.py`.** They intentionally use images, positioned frames, header-anchored background bands, and a table layout, all of which break ATS parsers. They are for human readers only: networking, direct email to a hiring manager, and in-person handoffs. The ATS versions remain the ones to upload to application portals. The no-fabrication, domain-framing, and repetition rules already applied to the source content carry over unchanged.
+
+If either script fails, fix the content JSON (a missing required field is the usual cause) and re-run. Don't skip the output.
 
 ## 9. Report back
 
@@ -92,4 +115,4 @@ For each JD processed, summarize:
 - **Domain fit** — always include this line, every JD, every run: either "Direct domain match" (name the domain) or the adjacent domain/business model used to bridge the gap (per step 4). Never omit this line, even when the gap is small.
 - Final ATS composite score + must-have/nice-to-have coverage
 - Any genuine gaps (JD requirements with no real match in the user's background) — surfaced honestly, not papered over
-- File paths of the two output documents
+- File paths of all four output documents (ATS resume, ATS cover letter, Professional resume, Professional cover letter), noting that the two Professional files are not ATS-checked
