@@ -35,8 +35,16 @@ const {
 const fs = require("fs");
 const zlib = require("zlib");
 
-const NAVY = "1B2A49";
-const ACCENT = "C9A24B";
+// User-customizable via content.colors {sidebar, accent} — same keys and defaults as
+// build_professional.py. main() sets PRIMARY/ACCENT, falling back per value on anything invalid.
+const DEFAULT_COLORS = { sidebar: "1B2A49", accent: "C9A24B" }; // navy, muted gold
+let PRIMARY = DEFAULT_COLORS.sidebar;
+let ACCENT = DEFAULT_COLORS.accent;
+
+function resolveColor(value, fallback) {
+  const m = typeof value === "string" && value.trim().match(/^#?([0-9a-fA-F]{6})$/);
+  return m ? m[1].toUpperCase() : fallback;
+}
 const SIDEBAR_TEXT = "FFFFFF";
 const SIDEBAR_MUTED = "C9D3E6";
 const MAIN_TEXT = "222222";
@@ -131,17 +139,20 @@ function sidebarHeading(text) {
     border: { bottom: { color: ACCENT, size: 4, style: BorderStyle.SINGLE, space: 4 } },
   });
 }
+// Bullets are a literal "• " prepended to the item text, not Word's native list
+// numbering — a native bullet glyph ignores the run color and renders black on the sidebar.
+// A hanging indent keeps wrapped lines aligned with the text after the bullet.
 function sidebarLine(text, opts = {}) {
   return new Paragraph({
     spacing: { after: opts.after ?? 45 },
-    bullet: opts.bullet ? { level: 0 } : undefined,
-    children: richRuns(text, { size: opts.size || 17, color: opts.color || SIDEBAR_TEXT, boldColor: opts.color || SIDEBAR_TEXT, bold: opts.bold }),
+    indent: opts.bullet ? { left: 200, hanging: 200 } : undefined,
+    children: richRuns(opts.bullet ? `• ${text}` : text, { size: opts.size || 17, color: opts.color || SIDEBAR_TEXT, boldColor: opts.color || SIDEBAR_TEXT, bold: opts.bold }),
   });
 }
 function letterPara(text) {
   return new Paragraph({
     spacing: { after: 180, line: 264 },
-    children: richRuns(text, { size: 19, color: MAIN_TEXT, boldColor: NAVY }),
+    children: richRuns(text, { size: 19, color: MAIN_TEXT, boldColor: PRIMARY }),
   });
 }
 
@@ -207,7 +218,7 @@ function buildLetterBody(c) {
   }
   children.push(new Paragraph({
     spacing: { after: 220 },
-    children: [new TextRun({ text: c.salutation, bold: true, color: NAVY, size: 20, font: "Calibri" })],
+    children: [new TextRun({ text: c.salutation, bold: true, color: PRIMARY, size: 20, font: "Calibri" })],
   }));
   for (const p of c.paragraphs) children.push(letterPara(p));
   children.push(new Paragraph({
@@ -216,7 +227,7 @@ function buildLetterBody(c) {
   }));
   children.push(new Paragraph({
     spacing: { before: 220 },
-    children: [new TextRun({ text: c.closing_name, bold: true, color: NAVY, size: 19, font: "Calibri" })],
+    children: [new TextRun({ text: c.closing_name, bold: true, color: PRIMARY, size: 19, font: "Calibri" })],
   }));
   return children;
 }
@@ -232,7 +243,7 @@ function build(c) {
       // build_professional.py uses for the Professional resume — so the band always
       // reaches the bottom of the page regardless of how much sidebar/letter text there is.
       headers: {
-        default: new Header({ children: [band(NAVY, 0, SIDEBAR_W_IN), band(ACCENT, SIDEBAR_W_IN, ACCENT_W_IN)] }),
+        default: new Header({ children: [band(PRIMARY, 0, SIDEBAR_W_IN), band(ACCENT, SIDEBAR_W_IN, ACCENT_W_IN)] }),
       },
       children: [
         new Table({
@@ -274,6 +285,9 @@ async function main() {
     process.exit(1);
   }
   const content = JSON.parse(fs.readFileSync(contentPath, "utf-8"));
+  const colors = content.colors && typeof content.colors === "object" ? content.colors : {};
+  PRIMARY = resolveColor(colors.sidebar, DEFAULT_COLORS.sidebar);
+  ACCENT = resolveColor(colors.accent, DEFAULT_COLORS.accent);
   const doc = build(content);
   const buf = await Packer.toBuffer(doc);
   fs.writeFileSync(outPath, buf);

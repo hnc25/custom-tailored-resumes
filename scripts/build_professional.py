@@ -54,8 +54,12 @@ IDENTITY_FIELDS = ("name", "contact", "education")
 REQUIRED_FIELDS = IDENTITY_FIELDS + ("headline", "profile", "core_expertise", "experience")
 
 FONT = "Calibri"
-NAVY = "1B2A49"
-ACCENT = "C9A24B"          # muted gold: sidebar headings + thin edge rule
+# User-customizable via the content JSON's "colors" object (see reference/professional_schema.json).
+# "sidebar" fills the sidebar band and colors main-column headings/names; "accent" colors
+# sidebar headings, bullets, rules, and the thin edge stripe. build() sets PRIMARY/ACCENT from it.
+DEFAULT_COLORS = {"sidebar": "1B2A49", "accent": "C9A24B"}  # navy, muted gold
+PRIMARY = DEFAULT_COLORS["sidebar"]
+ACCENT = DEFAULT_COLORS["accent"]
 SIDEBAR_TEXT = "FFFFFF"
 SIDEBAR_MUTED = "C9D3E6"
 MAIN_TEXT = "222222"
@@ -79,6 +83,25 @@ def validate(content, required=REQUIRED_FIELDS):
                          "(pull these from reference/core-resume.docx / background-notes.md)")
     if not PHOTO.exists():
         raise FileNotFoundError(f"photo not found at {PHOTO} — add your headshot as reference/photo.jpg")
+
+
+def resolve_colors(content):
+    """Return {"sidebar", "accent"} as 6-digit hex (no "#"). Missing values use the
+    default; invalid ones (wrong type, not 6 hex digits) warn and use the default."""
+    given = content.get("colors")
+    if given is None:
+        given = {}
+    elif not isinstance(given, dict):
+        print(f"warning: colors should be an object like {DEFAULT_COLORS}; using defaults", file=sys.stderr)
+        given = {}
+    out = {}
+    for key, default in DEFAULT_COLORS.items():
+        val = given.get(key)
+        m = re.fullmatch(r"#?([0-9A-Fa-f]{6})", val.strip()) if isinstance(val, str) else None
+        if val is not None and not m:
+            print(f"warning: colors.{key} = {val!r} is not a 6-digit hex color; using default #{default}", file=sys.stderr)
+        out[key] = m.group(1).upper() if m else default
+    return out
 
 
 # ---------- low-level helpers ----------
@@ -302,14 +325,14 @@ def build_sidebar_page2(header, c):
 def _main_heading(d, text):
     p = d.add_paragraph()
     _fmt(p, before=9, after=4, keep_next=True)
-    _style_run(p.add_run(text.upper()), 11, bold=True, color=NAVY, spacing=1.2)
+    _style_run(p.add_run(text.upper()), 11, bold=True, color=PRIMARY, spacing=1.2)
     _bottom_border(p, ACCENT, sz=8, space=2)
 
 
 def build_main(d, c):
     p = d.add_paragraph()
     _fmt(p, after=1, line=0.95, keep_next=True)
-    _style_run(p.add_run(c["headline"]), 15, bold=True, color=NAVY)
+    _style_run(p.add_run(c["headline"]), 15, bold=True, color=PRIMARY)
     if c.get("tagline"):
         p = d.add_paragraph()
         _fmt(p, after=2, keep_next=True)
@@ -319,14 +342,14 @@ def build_main(d, c):
     for para in c["profile"]:
         p = d.add_paragraph()
         _fmt(p, after=4, line=1.05)
-        _rich(p, para, 9.5, bold_color=NAVY)
+        _rich(p, para, 9.5, bold_color=PRIMARY)
 
     _main_heading(d, "Professional Experience")
     for job in c["experience"]:
         p = d.add_paragraph()
         _fmt(p, before=5, after=0, keep_next=True)
         p.paragraph_format.tab_stops.add_tab_stop(Inches(MAIN_W), WD_TAB_ALIGNMENT.RIGHT)
-        _style_run(p.add_run(job["company"].upper()), 10.5, bold=True, color=NAVY)
+        _style_run(p.add_run(job["company"].upper()), 10.5, bold=True, color=PRIMARY)
         _style_run(p.add_run("\t" + job["dates"]), 9, color=MAIN_MUTED)
         p = d.add_paragraph()
         _fmt(p, after=2, keep_next=True)
@@ -335,7 +358,7 @@ def build_main(d, c):
             p = d.add_paragraph()
             _fmt(p, after=2, line=1.03, left=0.17, first=-0.17)
             _style_run(p.add_run("▪  "), 8, color=ACCENT)
-            _rich(p, b, 9.5, bold_color=NAVY)
+            _rich(p, b, 9.5, bold_color=PRIMARY)
 
 
 # ---------- entry point ----------
@@ -362,7 +385,7 @@ def _construct(c, two_page):
     for h in headers:
         h.is_linked_to_previous = False
         h.paragraphs[0].paragraph_format.space_after = Pt(0)
-        _add_band(h, NAVY, 0, SIDEBAR_W, PAGE_H)
+        _add_band(h, PRIMARY, 0, SIDEBAR_W, PAGE_H)
         _add_band(h, ACCENT, SIDEBAR_W, 0.05, PAGE_H)
     if two_page:
         build_sidebar_page2(s.header, c)  # s.header = pages 2+
@@ -412,7 +435,10 @@ def _estimate_pages(c):
 
 
 def build(content, out_path):
+    global PRIMARY, ACCENT
     validate(content)
+    colors = resolve_colors(content)
+    PRIMARY, ACCENT = colors["sidebar"], colors["accent"]
     c = dict(content)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     # Word frames cannot flow across pages, so the sidebar layout depends on page count.

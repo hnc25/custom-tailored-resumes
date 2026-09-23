@@ -1,6 +1,12 @@
 {
   "_comment": "Content formats for the two Professional outputs. Bold markup inside strings: **text**. Identity fields (name, credentials, contact, education, certifications) are REQUIRED to come from reference/core-resume.docx and reference/background-notes.md — never invented. credentials and certifications are optional; their sidebar sections are omitted when empty. Everything else reuses content already drafted in /tailor-resume (the ATS resume and the step 6 letter draft).",
 
+  "colors": {
+    "_comment": "OPTIONAL in either content JSON below. 6-digit hex, with or without #. sidebar = sidebar band + main-column headings and names; accent = sidebar headings, bullets, rules, and the thin edge stripe. Omitted or invalid values fall back to the defaults shown here (navy / muted gold). Sidebar text is white, so pick a dark sidebar color. Use the same colors in both files so the two documents match.",
+    "sidebar": "1B2A49",
+    "accent": "C9A24B"
+  },
+
   "professional_resume": {
     "_file": "professional_<Company>.json -> scripts/build_professional.py",
     "name": "Your Name",
@@ -8,6 +14,7 @@
     "contact": ["City, ST", "phone", "email", "linkedin.com/in/you"],
     "education": [{"degree": "Degree, Field", "school": "Institution"}],
     "certifications": ["Certification name (optional)"],
+    "colors": {"sidebar": "1B2A49", "accent": "C9A24B"},
     "headline": "TARGET ROLE TITLE | TARGET-ROLE TAGLINE",
     "tagline": "One-line italic subtitle under the headline (optional)",
     "profile": ["Executive profile paragraph 1.", "Executive profile paragraph 2 (optional)."],
@@ -29,6 +36,7 @@
     "contact": ["(same as resume)"],
     "education": [{"degree": "(same as resume)", "school": "..."}],
     "certifications": ["(optional, same as resume)"],
+    "colors": {"sidebar": "(optional, same as resume)", "accent": "..."},
     "core_expertise": ["(same list as the Professional resume sidebar)"],
     "date": "Month D, YYYY",
     "recipient": ["Hiring Manager name (optional)", "Company", "City, ST"],

@@ -35,7 +35,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_professional import IDENTITY_FIELDS, PHOTO, _portrait_crop, validate  # noqa: E402
+from build_professional import IDENTITY_FIELDS, PHOTO, _portrait_crop, resolve_colors, validate  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RENDERER = Path(__file__).resolve().parent / "build_cover_letter.js"
@@ -47,6 +47,7 @@ def build(content, out_path):
     validate(content, REQUIRED_FIELDS)
     c = {"credentials": "", "certifications": [], "closing": "Sincerely,",
          "closing_name": content["name"], **content}
+    c["colors"] = resolve_colors(content)  # normalized here so warnings surface; the renderer re-checks
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

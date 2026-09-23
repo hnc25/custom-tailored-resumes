@@ -18,6 +18,15 @@ Generates ATS-optimized tailored resumes, plus visual resume + cover letter vers
    - **`reference/background-notes.md`** (optional but recommended) — an extended fact bank: named tools, certifications, compliance frameworks, board/leadership roles, and role-level detail that didn't make it into the core resume but are still real and usable for adjacent-skill matching. A LinkedIn profile export is a good source for this.
    - **`reference/style-examples/`** (optional but recommended) — up to two resumes you've already written (or like the tone/structure of) that represent the style you want tailored output to match. These are style references only — the pipeline pulls no new facts from them.
 
+**Custom colors (optional):** the two Professional outputs default to a navy sidebar (`#1B2A49`) with muted gold accents (`#C9A24B`). To use your own colors, add a `colors` object to the content JSONs (`professional_<Company>.json` and `cover_professional_<Company>.json`), or ask Claude to include it when running `/tailor-resume`:
+```json
+"colors": { "sidebar": "#2F4F3A", "accent": "#D98C5F" }
+```
+- `sidebar` fills the sidebar band and colors main-column headings, company names, and bold text.
+- `accent` colors sidebar headings, the resume's sidebar bullets, divider rules, and the thin edge stripe.
+
+Values are 6-digit hex, with or without `#`. If you leave out `colors` or either key, the default is used. An invalid value (like `"green"` or `"#12345"`) prints a warning and falls back to the default, so the build doesn't fail. Sidebar text is white, so pick a dark sidebar color. Use the same colors in both files so the resume and cover letter match. The format is in `reference/professional_schema.json`.
+
 **Keeping `background-notes.md` current:** if you supply one, its usefulness depends on staying current. If your background changes meaningfully (new role, new certs, new board positions), update the file — the tailoring pipeline is only as good as this file staying accurate.
 
 ## Usage
