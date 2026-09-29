@@ -70,6 +70,14 @@ Using `reference/core-resume.docx` as the base and any supplied `reference/style
 
 Generate a fresh, professional cover letter (not reused from any fixed template) — proper business letter heading (the user's contact info, date, hiring company/manager if named in the JD, salutation), 3-4 paragraphs: opening hook tied to the specific role, 1-2 paragraphs connecting the user's real background to the JD's top priorities, closing with a call to action. This step drafts the letter **content** only (recipient, salutation, paragraphs, closing). It is not saved as its own plain `.docx` and is not ATS-checked. Step 8b renders it as the Professional cover letter. The domain-framing decision from step 4 applies here too — never claim or imply direct domain experience the Executive Profile doesn't claim.
 
+**Strengths-forward only — never write gap language into the letter.** The letter must not contain any gap or limitation sentence: no "I don't have experience in X," "while I lack…," "I have not owned…," "to be candid about fit," "my experience is shorter than the N years listed," or a closing like "if that trade-off works for your team." When step 3 found a genuine gap:
+- Say nothing about the gap itself. Do not name the missing skill, tool, domain, or years requirement in a negative or hedged way.
+- Use that paragraph for the closest real, transferable experience from the user's source files, stated positively and confidently (e.g., for a missing domain, the adjacent domain or business model from step 4; for a missing tool, the real capability the tool serves).
+- Never overcorrect into claiming the gap. The no-fabrication rule still applies, so the transferable strength must be true as written.
+- The honest gap analysis goes into the step 9 report ONLY.
+
+Before moving on, reread the drafted letter and remove any sentence that admits a gap or limitation.
+
 ## 7. Run the ATS check
 
 ```bash
@@ -113,5 +121,5 @@ For each JD processed, summarize:
 - Role bucket classification (and why)
 - **Domain fit** — always include this line, every JD, every run: either "Direct domain match" (name the domain) or the adjacent domain/business model used to bridge the gap (per step 4). Never omit this line, even when the gap is small.
 - Final ATS composite score + must-have/nice-to-have coverage
-- Any genuine gaps (JD requirements with no real match in the user's background) — surfaced honestly, not papered over
+- Any genuine gaps (JD requirements with no real match in the user's background) — surfaced honestly, not papered over. This report is the ONLY place gap language belongs; the cover letter never contains it. For each gap, name the transferable strength the cover letter used in its place.
 - File paths of all three output documents (ATS resume, Professional resume, Professional cover letter), noting that the two Professional files are not ATS-checked

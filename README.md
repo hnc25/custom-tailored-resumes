@@ -64,6 +64,8 @@ Plus a summary in the chat covering:
 - The final ATS composite score and keyword coverage
 - Any real gaps between the JD's requirements and your actual background, surfaced honestly — the pipeline is instructed never to fabricate skills or experience to close a gap
 
+**Cover letters never mention gaps.** Gap analysis appears only in the chat summary above, never in the cover letter. Where a real gap exists, the letter doesn't acknowledge it ("I don't have experience in X," "while I lack…," "to be candid…"). It leads with the closest real, transferable strength from your background instead, still without claiming anything your source files don't support.
+
 ## How the ATS score works
 
 `scripts/ats_check.py` runs an objective, non-LLM check — the same categories a real ATS (Workday, Taleo, iCIMS, etc.) evaluates:
@@ -87,6 +89,7 @@ The full pipeline instructions live in `.claude/commands/tailor-resume.md` — e
 - The revision loop threshold (currently: revise up to 3 times if ATS composite score is below 80 or must-have coverage is below 90%)
 - The domain-framing rule (currently: never claim direct experience in a domain you haven't worked in — bridge honestly via the closest true adjacent domain instead)
 - The cross-section repetition guardrail (currently: never reuse the same sentence or near-identical phrasing twice within one document)
+- The cover-letter gap rule (currently: no gap/limitation language in the letter; gaps are reported only in the chat summary)
 
 ## Folder structure
 
