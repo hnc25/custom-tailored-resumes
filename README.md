@@ -61,6 +61,7 @@ The Professional resume reuses the exact tailored content from the ATS resume. N
 Plus a summary in the chat covering:
 - Role bucket classification (e.g., Product Management vs. Product Development framing) and why
 - **Domain fit** — whether the JD's industry/domain is a direct match to your real background, or which adjacent domain was used to bridge the gap (the pipeline is instructed to never claim direct domain experience you don't have)
+- **Credentials in summary** — what the JD says about education and certifications, whether you meet it, and whether a degree or certification was mentioned in the Executive Profile (and what capability it supports) or left out (and why)
 - The final ATS composite score and keyword coverage
 - Any real gaps between the JD's requirements and your actual background, surfaced honestly — the pipeline is instructed never to fabricate skills or experience to close a gap
 
@@ -88,6 +89,7 @@ The full pipeline instructions live in `.claude/commands/tailor-resume.md` — e
 - The keyword-matching strictness (currently: adjacent/reasonable inference allowed, no fabrication)
 - The revision loop threshold (currently: revise up to 3 times if ATS composite score is below 80 or must-have coverage is below 90%)
 - The domain-framing rule (currently: never claim direct experience in a domain you haven't worked in — bridge honestly via the closest true adjacent domain instead)
+- The credentials-in-summary rule (currently: a degree or certification appears in the Executive Profile only when it materially strengthens your positioning for that specific role; meeting a JD requirement is assessed separately and does not by itself earn summary space; your Education and Certifications sections always stay complete)
 - The cross-section repetition guardrail (currently: never reuse the same sentence or near-identical phrasing twice within one document)
 - The cover-letter gap rule (currently: no gap/limitation language in the letter; gaps are reported only in the chat summary)
 

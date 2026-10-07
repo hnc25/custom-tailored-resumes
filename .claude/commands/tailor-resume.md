@@ -60,6 +60,40 @@ This is separate from step 3 — step 3 matches individual skills/tools/keywords
 
 Carry the result of this step into step 9 (Report back) as the "Domain fit" line — required for every JD, every run.
 
+## 4a. Credentials in the Executive Profile / summary
+
+This step governs one decision: whether a degree or certification is mentioned in the **Executive Profile / summary** of the two resumes (ATS and Professional). It does not govern cover-letter content, and it never changes the Education or Certifications sections.
+
+**Principle:** a degree or certification appears in the Executive Profile only when it materially adds value for this specific candidate and this specific target role. This applies to every credential of every level and type: bachelor's, master's, MBA, doctorate, professional certification, license, or any other. None of them belongs in the summary merely because the user has it.
+
+Evaluate each credential against the JD and the user's source files:
+
+- Does the JD require a degree or certification, prefer one, mention one as optional, or say nothing?
+- Does the user meet, exceed, or fall short of what the JD states?
+- Is the credential's field relevant to the role?
+- Does it demonstrate meaningful domain knowledge, technical or business capability, breadth, or differentiation?
+- Does mentioning it contribute something the user's experience does not already demonstrate more strongly?
+- Would the limited summary space be better used for accomplishments, scope, leadership, or outcomes?
+
+Decision rules:
+
+- Never include a credential simply because the user has it.
+- Never include a credential simply because the JD mentions education or certification.
+- **Meeting a requirement and deserving summary space are not the same thing.** Meeting a minimum education requirement, or holding a certification the JD requires, does not by itself make the credential valuable summary content.
+- **Preserve factual gaps.** If the user's credential is below what the JD requires (e.g., the JD requires a master's and the user holds a bachelor's), never frame the lower credential as though it satisfies the requirement. Report the shortfall as a genuine gap in step 9.
+- If the JD says no degree is required, do not automatically suppress education. A relevant degree may still be included when it independently strengthens the positioning.
+- If the JD states no education requirement at all, make the same value-based determination.
+- Do not inventory multiple degrees or certifications in the summary.
+- If a credential is included, connect it to the specific capability or differentiation it helps demonstrate for this role. Do not merely name it. Derive that connection from this JD and the user's real experience each time; do not reuse a fixed sentence across JDs.
+- Institution names generally belong in the Education section, not the summary, unless there is an exceptional, defensible, role-specific reason.
+- If no credential adds meaningful positioning value, omit credentials from the summary entirely.
+
+The shape to avoid is a standalone list ("Holds a [degree] in [field], a [second degree], and [certification]."). The shape to use, when a credential earns its place, is a sentence in which it supports a capability the JD prioritizes ("[Capability the role needs], grounded in a [degree] in [relevant field]."). These are shapes, not wording to copy.
+
+**Source files are facts, not a pattern.** The user's `reference/core-resume.docx` or style examples may themselves list credentials in the summary. Treat that as a source of facts about what the user holds, not as phrasing to carry into the tailored profile.
+
+Whatever this step decides, Education and Certifications stay complete and accurate in their own sections of both resumes. Carry the decision into step 9 as the "Credentials in summary" line.
+
 ## 5. Draft the tailored resume
 
 Using `reference/core-resume.docx` as the base and any supplied `reference/style-examples/` docs as the style pattern, write a new tailored resume. Follow the `docx` skill (`/mnt/skills/public/docx/SKILL.md`) for creation mechanics — build with docx-js, US Letter page size, no tables/text boxes/multi-column layouts, no header/footer content, standard fonts only (Calibri, Arial, Georgia, or Cambria). This is a hard requirement — the ATS format check in step 7 will fail the resume otherwise.
@@ -86,6 +120,13 @@ python3 scripts/ats_check.py output/Resume_<Company>_<Date>.docx keywords_<Compa
 
 If the composite score is below 80, or must-have keyword coverage is below 90%, revise the resume (reweave missing must-have terms into existing bullets/competencies where truthfully supportable) and re-run the check. Do not loop more than 3 times — if you can't close the gap without fabricating, stop and report the genuine gaps to the user instead.
 
+**Credentials and the score are separate decisions:**
+
+- Keep education and certification information accurately represented in its own resume sections.
+- Evaluate a JD education or certification requirement accurately during the step 2–3 fit and keyword analysis: establish from the source files whether the user meets, exceeds, or falls short of it. When the JD explicitly requires a certification the user holds, list it clearly in the Certifications section and recognize the requirement as met. An unmet requirement is a genuine gap for step 9, not something to reword around.
+- Do not insert a degree or certification into the Executive Profile solely to increase keyword coverage or the ATS score.
+- Whether a credential belongs in the Executive Profile is decided independently, in step 4a, by whether it materially strengthens the user's positioning for this specific role.
+
 ## 8. Save outputs
 
 Save to the flat `output/` folder using this naming convention (all three are required, every JD):
@@ -100,7 +141,7 @@ Use today's date and the company name extracted from the JD (sanitize for filesy
 
 After the ATS resume has passed (or exhausted) the step 7 loop, build the two visual "Professional" documents: a two-column layout with a navy photo sidebar. **Do not redraft anything.** Both reuse the final, already-tailored content from steps 5–7:
 
-- **Identity/sidebar fields** (`name`, `credentials`, `contact`, `education`, `certifications`): pull these from `reference/core-resume.docx` (and `reference/background-notes.md` for certifications, if supplied). Use exactly what the user's source files say. Never invent or embellish. Omit `credentials`/`certifications` if the user has none; the scripts drop those sidebar sections when they're empty.
+- **Identity/sidebar fields** (`name`, `credentials`, `contact`, `education`, `certifications`): pull these from `reference/core-resume.docx` (and `reference/background-notes.md` for certifications, if supplied). Use exactly what the user's source files say. Never invent or embellish. Omit `credentials`/`certifications` if the user has none; the scripts drop those sidebar sections when they're empty. These fields stay complete regardless of the step 4a decision: leaving a credential out of the Executive Profile never removes it from the sidebar or from the Education and Certifications sections.
 - **Professional resume content** (`headline`, `tagline`, `profile`, `core_expertise`, `experience`): copy the final headline, Executive Profile, Core Competencies, and per-role bullets from the ATS resume as finalized in step 7. If there are more than ~12 competencies, keep the most JD-relevant ~12 for the sidebar. `**bold**` markup may highlight metrics.
 - **Professional cover letter content** (`date`, `recipient`, `salutation`, `paragraphs`, `closing`): copy verbatim from the step 6 cover letter draft. Use the same `core_expertise` list as the Professional resume.
 
@@ -120,6 +161,7 @@ If either script fails, fix the content JSON (a missing required field is the us
 For each JD processed, summarize:
 - Role bucket classification (and why)
 - **Domain fit** — always include this line, every JD, every run: either "Direct domain match" (name the domain) or the adjacent domain/business model used to bridge the gap (per step 4). Never omit this line, even when the gap is small.
+- **Credentials in summary** (step 4a) — always include this line: what the JD states about education and certifications (required, preferred, optional, not required, or not mentioned), whether the user meets, exceeds, or falls short of it, and the summary decision: either the credential included and the capability it supports, or that credentials were omitted from the summary and why.
 - Final ATS composite score + must-have/nice-to-have coverage
 - Any genuine gaps (JD requirements with no real match in the user's background) — surfaced honestly, not papered over. This report is the ONLY place gap language belongs; the cover letter never contains it. For each gap, name the transferable strength the cover letter used in its place.
 - File paths of all three output documents (ATS resume, Professional resume, Professional cover letter), noting that the two Professional files are not ATS-checked
