@@ -8,3 +8,23 @@ node_modules/
 reference/photo.jpg
 /professional_*.json
 /cover_professional_*.json
+
+# Candidate-owned evidence, job descriptions and generated documents — never commit.
+# The repo ships reusable logic and synthetic examples only (tests/fixtures).
+reference/core-resume.docx
+reference/background-notes.md
+reference/identity.json
+reference/evidence_rules.json
+reference/known_gaps.json
+reference/style-examples/*
+!reference/style-examples/.gitkeep
+/keywords_*.json
+/evidence_map_*.json
+/application_*.json
+/output/*
+!/output/.gitkeep
+/jobs/*
+!/jobs/.gitkeep
+!/jobs/applied/
+/jobs/applied/*
+!/jobs/applied/.gitkeep

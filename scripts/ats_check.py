@@ -3,7 +3,12 @@
 ats_check.py — Objective ATS-compatibility and keyword-match scoring for a .docx resume.
 
 Usage:
-    python3 ats_check.py <resume.docx> <keywords.json> [--json]
+    python3 ats_check.py <resume.docx> <keywords.json> [--json] [--map evidence_map_<Company>.json]
+
+With --map, the report adds ROLE FIT from the evidence map. Keyword coverage and role fit
+are different measurements and are reported separately: a keyword that matches the text is
+not substantive coverage when the JD means something else by it, or when the requirement
+behind it is an open question or a confirmed gap. The composite score is not changed by --map.
 
 keywords.json format:
 {
@@ -175,11 +180,55 @@ def check_keywords(text, keywords):
     }
 
 
+def role_fit_report(keywords_result, emap):
+    """Requirement-level fit from the evidence map, plus the matched keywords that are not backed
+    by a supported requirement. Separate from, and never folded into, the keyword score."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from evidence_map import LIMITS, keyword_support, role_fit
+    support = keyword_support(emap)
+    matched = [t for t, _ in keywords_result["must_have_matched"] + keywords_result["nice_to_have_matched"]]
+    unbacked = {lv: [t for t in matched if support.get(t.lower()) == lv] for lv in ("keyword_only", "unsupported")}
+    unmapped = [t for t in matched if t.lower() not in support]
+    must = [t for t, _ in keywords_result["must_have_matched"]] + keywords_result["must_have_missing"]
+    substantive = [t for t in must if support.get(t.lower()) in ("supported", "partial")
+                   and t in [m for m, _ in keywords_result["must_have_matched"]]]
+    return {
+        "requirements": role_fit(emap),
+        "must_have_substantive_pct": round(len(substantive) / len(must) * 100) if must else 100,
+        "matched_keyword_only": unbacked["keyword_only"],
+        "matched_but_requirement_open_or_gap": unbacked["unsupported"],
+        "matched_not_in_map": unmapped,
+        "limits": LIMITS,
+    }
+
+
+def print_role_fit(fit, must_pct):
+    print("Role Fit (from the evidence map; separate from the keyword score)")
+    for imp, name in (("must", "Must-have"), ("nice", "Nice-to-have")):
+        f = fit["requirements"][imp]
+        if f["total"]:
+            print(f"  {name} requirements: {f['total']} — confirmed {len(f['confirmed_activity'])}, supported paraphrase {len(f['supported_paraphrase'])}, "
+                  f"partial {len(f['partial_match'])}, open questions {len(f['open_question'])}, confirmed gaps {len(f['confirmed_gap'])}")
+            for cls, label in (("open_question", "Open question"), ("confirmed_gap", "Confirmed gap")):
+                for req in f[cls]:
+                    print(f"    {label}: {req}")
+    print(f"  Must-have keywords: {must_pct}% matched in the text, {fit['must_have_substantive_pct']}% matched AND backed by a supported or partial requirement")
+    if fit["matched_keyword_only"]:
+        print(f"  Matched, but the JD means something else: {', '.join(fit['matched_keyword_only'])}")
+    if fit["matched_but_requirement_open_or_gap"]:
+        print(f"  Matched, but the requirement is an open question or confirmed gap: {', '.join(fit['matched_but_requirement_open_or_gap'])}")
+    if fit["matched_not_in_map"]:
+        print(f"  Matched, not reviewed in the map: {', '.join(fit['matched_not_in_map'])}")
+    print(f"  {fit['limits']}")
+    print()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("resume", help="Path to tailored resume .docx")
     parser.add_argument("keywords", help="Path to keywords.json (must_have / nice_to_have arrays)")
     parser.add_argument("--json", action="store_true", help="Output raw JSON instead of a report")
+    parser.add_argument("--map", help="Evidence map for this application; adds a role-fit section (score unchanged)")
     args = parser.parse_args()
 
     resume_path = Path(args.resume)
@@ -192,7 +241,7 @@ def main():
         print(f"ERROR: {keywords_path} not found", file=sys.stderr)
         sys.exit(1)
 
-    keywords = json.loads(keywords_path.read_text())
+    keywords = json.loads(keywords_path.read_text(encoding="utf-8"))
     text, doc = load_docx_text(resume_path)
 
     kw_result = check_keywords(text, keywords)
@@ -210,6 +259,11 @@ def main():
         "format": {"score": format_score, "issues": format_issues},
         "sections": {"score": section_score, "missing": missing_sections},
     }
+
+    fit = None
+    if args.map:
+        fit = role_fit_report(kw_result, json.loads(Path(args.map).read_text(encoding="utf-8")))
+        result["role_fit"] = fit
 
     if args.json:
         print(json.dumps(result, indent=2))
@@ -238,6 +292,11 @@ def main():
     else:
         print("  All standard sections present.")
     print()
+    if fit:
+        print_role_fit(fit, kw_result["must_have_pct"])
+    else:
+        print("Keyword coverage is not role fit: it counts terms in the text, whatever they mean there. "
+              "Pass --map evidence_map_<Company>.json for requirement-level fit.\n")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,60 @@
+{
+  "company": "AcmeFreight",
+  "role": "Director of Product (synthetic example)",
+  "rows": [
+    {
+      "requirement": "Use funnel analysis to find and act on growth opportunities",
+      "importance": "must",
+      "jd_meaning": "Analyse step-by-step conversion through an onboarding flow and act on where users drop out",
+      "classification": "supported_paraphrase",
+      "source": "reference/background-notes.md: Northwind Logistics (user-confirmed 2025-03-04)",
+      "source_quote": "reviewed where carriers dropped out between account creation, document upload, and first booking",
+      "activity": "Weekly SQL review of carrier drop-off across three onboarding steps",
+      "claim": "Ran weekly funnel analysis in SQL of carrier onboarding, from account creation through document upload to first booking",
+      "boundary": "No result figure is linked to this analysis",
+      "keywords": ["funnel analysis", "SQL"],
+      "reviewed_terms": ["funnel analysis"]
+    },
+    {
+      "requirement": "Improve operational delivery metrics",
+      "importance": "must",
+      "jd_meaning": "Own product changes that move an operational metric",
+      "classification": "partial_match",
+      "source": "reference/background-notes.md: Northwind Logistics",
+      "source_quote": "On-time delivery improved from 82% to 91% after the routing release.",
+      "activity": "Wrote the requirements and acceptance criteria for the routing release",
+      "claim": "Wrote the requirements for a routing release, after which on-time delivery improved from 82% to 91%",
+      "boundary": "Engineering built the routing models; the candidate did not build or train them",
+      "keywords": ["on-time delivery"]
+    },
+    {
+      "requirement": "Run A/B tests and controlled experiments",
+      "importance": "must",
+      "jd_meaning": "Design and read controlled experiments on product changes",
+      "classification": "open_question",
+      "question": "Have you run A/B tests or other controlled experiments? If so: where, on what, and how were the results read?",
+      "keywords": ["A/B testing"]
+    },
+    {
+      "requirement": "Manage the enterprise sales pipeline with the revenue team",
+      "importance": "must",
+      "jd_meaning": "Own deal-stage pipeline and manage sellers. Not a product roadmap pipeline",
+      "classification": "confirmed_gap",
+      "gap_label": "sales team management",
+      "keywords": ["sales management"],
+      "keyword_only": ["pipeline"]
+    },
+    {
+      "requirement": "Familiarity with workflow orchestration tools",
+      "importance": "nice",
+      "jd_meaning": "Has used a scheduler or orchestrator in product work",
+      "classification": "confirmed_activity",
+      "source": "reference/background-notes.md: Northwind Logistics (user-confirmed 2025-03-10)",
+      "source_quote": "I used Airflow at Northwind to schedule the weekly carrier reports.",
+      "activity": "Scheduled the weekly carrier reports in Airflow",
+      "claim": "Scheduled weekly carrier reports in Airflow",
+      "boundary": "Northwind only",
+      "keywords": ["Airflow"]
+    }
+  ]
+}

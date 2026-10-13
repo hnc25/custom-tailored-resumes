@@ -1,0 +1,77 @@
+{
+  "_comment": "SYNTHETIC evidence rules for a fictional candidate. Copy the shape, not the content. Precedence: the candidate's current confirmed statements govern claims; a clarification supersedes only the restriction it actually resolves.",
+  "_statuses": {
+    "confirmed_gap": "The candidate explicitly confirmed they do not have this. Needs source, confirmed_on and source_quote. Always blocked.",
+    "recorded_boundary": "Recorded as not done, exact words not preserved. Blocked until the candidate confirms or corrects it.",
+    "knowledge_only": "Acquired knowledge or tool use. Allowed only in a labelled knowledge line.",
+    "undocumented": "Nothing in the sources either way. NOT a gap. Needs an evidence review or a question to the candidate."
+  },
+  "sources": {"core": "reference/core-resume.docx", "notes": "reference/background-notes.md"},
+  "employers": ["Northwind Logistics", "Lumen Retail Group"],
+  "gaps": [
+    {
+      "label": "sales team management",
+      "claim": "\\b(managed|led|ran)\\b[^.]{0,30}\\bsales (team|organization)\\b|\\bsales (team )?management\\b",
+      "status": "confirmed_gap",
+      "source": "reference/background-notes.md: Confirmed gaps",
+      "confirmed_on": "2025-03-04",
+      "source_quote": "I have never managed a sales team.",
+      "note": "confirmed by the candidate"
+    },
+    {
+      "label": "funnel analysis",
+      "claim": "\\bfunnel\\b",
+      "status": "undocumented",
+      "note": "the word is not in the sources. That alone does not show the candidate has not done it"
+    },
+    {
+      "label": "A/B testing",
+      "claim": "\\bA/B test(s|ing)?\\b",
+      "status": "undocumented",
+      "note": "nothing in the sources either way; ask the candidate"
+    },
+    {
+      "label": "streaming tooling (Kafka)",
+      "claim": "\\bKafka\\b",
+      "status": "undocumented",
+      "note": "narrowed 2025-03-10: Airflow was removed from this pattern when the candidate confirmed it. Kafka was not part of that answer"
+    },
+    {
+      "label": "vector search (acquired knowledge)",
+      "claim": "\\bvector search\\b",
+      "status": "knowledge_only",
+      "source": "reference/background-notes.md: Working knowledge",
+      "confirmed_on": "2025-03-04",
+      "note": "personal projects only"
+    }
+  ],
+  "confirmed_terms": [
+    {
+      "term": "Airflow",
+      "employers": ["Northwind Logistics"],
+      "source": "reference/background-notes.md: Northwind Logistics",
+      "confirmed_on": "2025-03-10",
+      "source_quote": "I used Airflow at Northwind to schedule the weekly carrier reports.",
+      "boundary": "Northwind only; report scheduling, not pipeline engineering"
+    }
+  ],
+  "unlinked_claims": [
+    {
+      "label": "drop-off review linked to the on-time delivery result",
+      "a": "\\b(funnel|drop-?off)\\b",
+      "b": "\\b(82|91)\\s?%",
+      "source": "reference/background-notes.md: Northwind Logistics",
+      "confirmed_on": "2025-03-04",
+      "note": "candidate's instruction: \"Do not connect my weekly drop-off review to the on-time delivery improvement.\""
+    }
+  ],
+  "boundaries": [
+    {
+      "label": "built or trained the routing models",
+      "claim": "\\b(built|trained|developed|engineered)\\b[^.]{0,25}\\bmodels?\\b",
+      "source": "reference/background-notes.md: Northwind Logistics",
+      "confirmed_on": "2025-03-04",
+      "note": "candidate: \"I did not build or train the routing models.\" Engineering built them"
+    }
+  ]
+}

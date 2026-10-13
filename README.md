@@ -63,7 +63,8 @@ Plus a summary in the chat covering:
 - **Domain fit** — whether the JD's industry/domain is a direct match to your real background, or which adjacent domain was used to bridge the gap (the pipeline is instructed to never claim direct domain experience you don't have)
 - **Credentials in summary** — what the JD says about education and certifications, whether you meet it, and whether a degree or certification was mentioned in the Executive Profile (and what capability it supports) or left out (and why)
 - The final ATS composite score and keyword coverage
-- Any real gaps between the JD's requirements and your actual background, surfaced honestly — the pipeline is instructed never to fabricate skills or experience to close a gap
+- Role fit from the evidence map, reported separately from the keyword score
+- Open questions (things your sources don't say either way) and confirmed gaps, kept apart and surfaced honestly — the pipeline is instructed never to fabricate skills or experience to close a gap
 
 **Cover letters never mention gaps.** Gap analysis appears only in the chat summary above, never in the cover letter. Where a real gap exists, the letter doesn't acknowledge it ("I don't have experience in X," "while I lack…," "to be candid…"). It leads with the closest real, transferable strength from your background instead, still without claiming anything your source files don't support.
 
@@ -80,14 +81,48 @@ You can run it manually any time on any resume:
 python3 scripts/ats_check.py output/Resume_Acme_2026-09-06.docx keywords_Acme.json
 ```
 
-**The revision loop:** if the composite score comes back below 80, or must-have keyword coverage is below 90%, the pipeline will automatically revise the resume (reweaving missing must-have terms into existing bullets/competencies where truthfully supportable) and re-check, up to 3 times. If it still can't close the gap without fabricating, it stops and reports the genuine gap to you instead of papering over it.
+**The score is keyword coverage, not role fit.** It counts whether a term appears in the text, whatever it means there. Pass `--map evidence_map_<Company>.json` and the report adds a separate **Role Fit** section from your evidence map: how many requirements are confirmed, supported, partial, open questions or confirmed gaps, and which matched keywords do not actually cover the requirement behind them.
+
+**The revision loop:** a composite of 80 and must-have coverage of 90% are targets, not requirements. Below target, the pipeline adds a missing term only where your evidence supports the requirement behind it, re-checks up to 3 times, then stops and reports the score as it stands, explained by your confirmed gaps and open questions. It does not add unsupported claims to reach a score.
+
+## How evidence is handled
+
+The pipeline separates what you did from how it is worded, and it asks instead of guessing.
+
+1. **Evidence map first.** Before drafting, each important JD requirement is mapped to your evidence in `evidence_map_<Company>.json` and put in one of five classes:
+   - **confirmed activity**: your sources say it in these terms;
+   - **supported paraphrase**: your sources record the activity in other words, and the JD term is standard wording for it;
+   - **partial match**: your evidence covers part of the requirement, with the boundary written down;
+   - **open question**: your sources say nothing either way;
+   - **confirmed gap**: you have said you don't have it.
+
+   A term missing from your resume is an open question, not a gap. Only your own statement makes a gap.
+2. **Questions together.** Open questions that would change a claim are put to you in one message before anything is built.
+3. **Answers are kept.** Your full answer is saved, dated, in `reference/background-notes.md`, and the rule it resolves is updated in `reference/evidence_rules.json`. A confirmation lifts only the restriction it actually resolves, and you are not asked the same thing for the next application.
+4. **One definition, three documents.** `scripts/build_application.py` renders the ATS resume, the Professional resume and the cover letter from a single `application_<Company>.json`.
+5. **QA gate.** `scripts/qa_check.py` blocks third-person voice, figures that are in neither source file, cover-letter gap admissions, confirmed gaps stated as experience, a confirmed term placed under the wrong employer, and links or claims you said must not be made.
+6. **Final inspection.** After the last content change, every page of all three documents is rendered and looked at, and the text is read against the evidence map.
+
+`reference/evidence_rules.example.json` shows the rules format, and `tests/fixtures/` holds a complete worked example. Both describe a fictional candidate.
+
+**What the automated checks cannot tell you.** They are pattern and completeness checks. A complete evidence map does not establish that a quoted source really supports the claim built on it, or that the claim is correct. The gate does not detect every unsupported causal or ownership claim: one worded outside your recorded rules, or split across two sentences, passes. Each tool prints these limits when it runs. Read the final documents yourself before sending them.
+
+## Your data stays yours
+
+Your resume, notes, evidence rules, photo, style examples, job descriptions, keyword files, evidence maps, application definitions and outputs are all excluded by `.gitignore`. The repository itself contains only reusable logic, neutral instructions and the synthetic example. If you fork it, run the tests before you push:
+
+```
+python3 -m unittest discover -s tests
+```
+
+They exercise the workflow on the synthetic candidate and fail if candidate-owned files or real-looking contact details would be published. They read text files only, so check binary files yourself.
 
 ## Editing the tailoring logic
 
 The full pipeline instructions live in `.claude/commands/tailor-resume.md` — edit that file directly if you want to change:
 - How the role-bucket framing axis is defined (the default is Product Management vs. Product Development — swap this for whatever axis fits your own field)
-- The keyword-matching strictness (currently: adjacent/reasonable inference allowed, no fabrication)
-- The revision loop threshold (currently: revise up to 3 times if ATS composite score is below 80 or must-have coverage is below 90%)
+- The evidence rules (currently: five evidence classes; a supported paraphrase of a recorded activity is allowed; a missing term is a question for you, not a gap; no fabrication)
+- The revision loop targets (currently: up to 3 revisions toward a composite of 80 and must-have coverage of 90%, adding only supported terms)
 - The domain-framing rule (currently: never claim direct experience in a domain you haven't worked in — bridge honestly via the closest true adjacent domain instead)
 - The credentials-in-summary rule (currently: a degree or certification appears in the Executive Profile only when it materially strengthens your positioning for that specific role; meeting a JD requirement is assessed separately and does not by itself earn summary space; your Education and Certifications sections always stay complete)
 - The cross-section repetition guardrail (currently: never reuse the same sentence or near-identical phrasing twice within one document)
@@ -104,13 +139,21 @@ custom-tailored-resumes/
 │   ├── PUT_YOUR_PHOTO_HERE.md          ← placeholder note for photo.jpg
 │   ├── background-notes.md             ← YOU SUPPLY THIS (optional) — extended facts for adjacent-skill matching
 │   ├── style-examples/                 ← YOU SUPPLY THESE (optional) — up to two style-pattern resumes
+│   ├── evidence_rules.json             ← YOURS (optional, gitignored) — what you have confirmed: gaps, scoped terms, limits
+│   ├── evidence_rules.example.json     ← rules format, for a fictional candidate
 │   ├── keywords_schema.json            ← format for the per-JD keyword extraction file
 │   └── professional_schema.json        ← content format for the two Professional outputs
 ├── scripts/
-│   ├── ats_check.py                    ← objective ATS scoring
+│   ├── build_application.py            ← one application definition → all three documents, with the checks below
+│   ├── evidence_map.py                 ← evidence-map check, open questions, evidence-rules consistency
+│   ├── qa_check.py                     ← QA gate: voice, figures, evidence rules
+│   ├── build_docx.py                   ← ATS resume builder
+│   ├── preview_docx.py                 ← render every page to PNG for inspection
+│   ├── ats_check.py                    ← objective ATS scoring, plus role fit with --map
 │   ├── build_professional.py           ← Professional (two-column, photo) resume builder
 │   ├── build_cover_letter_professional.py  ← Professional cover letter builder (calls the .js renderer)
 │   └── build_cover_letter.js           ← docx-js renderer for the Professional cover letter
+├── tests/                              ← regression tests and a complete synthetic example (tests/fixtures)
 ├── package.json                        ← Node dependency (docx); run `npm install` once
 ├── jobs/                               ← drop JD .txt files here for batch mode
 │   └── applied/                        ← move a JD's .txt file here once you've applied
